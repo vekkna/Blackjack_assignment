@@ -1,48 +1,65 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Blackjack_NCrowley
 {
+    /*
+     * TODOs
+     * Extra score for bj
+     * Save high score
+     * Separate Dealer.cs?
+     * format cards better
+     * */
+
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             Game game = new Game(GetPlayers());
             game.PlayRound();
         }
 
+        /// <summary>
+        /// Asks how many players there will be and checks validity
+        /// </summary>
+        /// <returns>Number of players</returns>
         private static List<Player> GetPlayers()
         {
-            Console.WriteLine("Welcome to Blackjack.");
+            Console.WriteLine("Welcome to Blackjack.\n\n");
             Console.WriteLine("How many human players are there? (1 - 4)");
+
             int numPlayers;
 
             while (true)
             {
+                // if player doesn't enter a number, throw an error
                 try
                 {
                     numPlayers = Convert.ToInt32(Console.ReadLine());
-                    if (numPlayers < 1 || numPlayers > 5)
+                    //  if it's a number but not in the range, throw an error
+                    if (numPlayers < 1 || numPlayers > 4)
                     {
                         throw new Exception();
                     }
+                    // if it's a number in the right range break out of the validation loop
                     break;
                 }
                 catch
                 {
-                    Console.WriteLine("Please enter only numbers between 1 and 4.");
-                    continue;
+                    // respond to either error this way
+                    Console.WriteLine("Please enter only numbers between 1 and 4.\n");
                 }
             }
-
+            // Once the input is correct, return a list of that many players
             List<Player> players = new List<Player>();
+
+            //  players = from int num = IEnume
 
             for (int i = 0; i < numPlayers; i++)
             {
-                players.Add(new Player($"Player {i + 1}"));
+                players.Add(new Player(i + 1));
             }
-
             return players;
         }
     }

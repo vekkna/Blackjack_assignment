@@ -1,31 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Blackjack_NCrowley
 {
+    /// <summary>
+    /// The players and the dealer
+    /// </summary>
     internal class Player
     {
-        public string Name { get; private set; } // Todo use number word
-        public int Cash { get; set; }
-        public int Bet { get; set; }
-        public Hand Hand { get; set; }
+        // Properties
 
+        public string Name { get; }
+        public int Cash { get; private set; }
+        public int Bet { get; private set; }
+        public Hand Hand { get; private set; }
+        public bool IsBust => Hand.Value > 21;
 
-        public bool IsBust
+        // To convert the number used to create Players into a number word for the Name
+        private readonly Dictionary<int, string> numberWords = new Dictionary<int, string>()
         {
-            get
-            {
-                return Hand.Value > 21;
-            }
+            {1, "One" },
+            {2, "Two" },
+            {3, "Three" },
+            {4, "Four" }
+        };
+
+        /// <summary>
+        /// Contructor that takes an int and turns it into a Name string
+        /// </summary>
+        /// <param name="num">Int, converted to string number word</param>
+        /// <param name="cash">Default value for starting cash is 100</param>
+        public Player(int num, int cash = 100)
+        {
+            Name = $"Player { numberWords[num]}";
+            Cash = cash;
+            Hand = new Hand();
         }
 
+        /// <summary>
+        /// Ctor for making a player with a string for a name
+        /// </summary>
+        /// <param name="name">Player's name</param>
+        /// <param name="cash">Default value for starting cash is 100</param>
         public Player(string name, int cash = 100)
-        {  
+        {
             Name = name;
             Cash = cash;
             Hand = new Hand();
         }
 
+        /// <summary>
+        /// Takes a card from the deck, adds its to the hand, returns it so it's details can be printed
+        /// </summary>
+        /// <param name="deck">Deck from which to draw</param>
+        /// <returns>Drawn card</returns>
         public Card Draw(Deck deck)
         {
             Card card = deck.TakeTopCard();
@@ -33,24 +60,22 @@ namespace Blackjack_NCrowley
             return card;
         }
 
-        public void Draw(int n, Deck deck) // get rid of this?
-        {
-            for (; n > 0; n--)
-            {
-                Draw(deck);
-            }
-        }
-
+        /// <summary>
+        /// Makes a bet, decreasing cash by that amount so that losses don't need any methods.
+        /// </summary>
+        /// <param name="bet">Amount to bet</param>
         public void MakeBet(int bet)
         {
             Bet = bet;
             Cash -= bet;
         }
 
+        /// <summary>
+        /// Player wins amount bet
+        /// </summary>
         public void WinBet()
         {
             Cash += Bet * 2;
-            Bet = 0;
         }
     }
 }
