@@ -47,17 +47,17 @@ namespace Blackjack_NCrowley
             Hand = new Hand();
         }
 
-        /// <summary>
-        /// Takes a card from the deck, adds its to the hand, returns it so it's details can be printed
-        /// </summary>
-        /// <param name="deck">Deck from which to draw</param>
-        /// <returns>Drawn card</returns>
-        public Card Draw(Deck deck)
-        {
-            Card card = deck.TakeTopCard();
-            Hand.AddCard(card);
-            return card;
-        }
+        /*        /// <summary>
+                /// Takes a card from the deck, adds its to the hand, returns it so it's details can be printed
+                /// </summary>
+                /// <param name="deck">Deck from which to draw</param>
+                /// <returns>Drawn card</returns>
+                public Card Draw(Deck deck)
+                {
+                    Card card = deck.TakeTopCard();
+                    Hand.AddCard(card);
+                    return card;
+                }*/
 
         /// <summary>
         /// Makes a bet, decreasing cash by that amount so that losses don't need any methods.

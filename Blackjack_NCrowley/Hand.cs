@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Blackjack_NCrowley
 {
@@ -62,7 +61,7 @@ namespace Blackjack_NCrowley
 
         public override string ToString()
         {
-            return string.Join(" ", Cards);
+            return string.Join(" and ", Cards);
         }
     }
 }
