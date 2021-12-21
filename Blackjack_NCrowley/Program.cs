@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Blackjack_NCrowley
 {
@@ -51,16 +52,8 @@ namespace Blackjack_NCrowley
                     Console.WriteLine("Please enter only numbers between 1 and 4.\n");
                 }
             }
-            // Once the input is correct, return a list of that many players
-            List<Player> players = new List<Player>();
-
-            //  players = from int num = IEnume
-
-            for (int i = 0; i < numPlayers; i++)
-            {
-                players.Add(new Player(i + 1));
-            }
-            return players;
+            // Once the input is correct, return a list of that many players to pass to Game.cs's ctor
+            return (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
         }
     }
 }

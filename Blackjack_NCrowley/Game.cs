@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,10 +10,14 @@ namespace Blackjack_NCrowley
     /// </summary>
     internal class Game
     {
-        // Properties
+        // Fields
 
+        // The currently (not broke) players
         private readonly List<Player> Players;
+
+        // Used for printing the final scores
         private readonly List<Player> StartingPlayers;
+
         private readonly Player Dealer;
         private readonly Deck deck;
         private int roundsRemaining = 5;
@@ -24,6 +29,7 @@ namespace Blackjack_NCrowley
         public Game(List<Player> players)
         {
             Players = players;
+            // Copy the Players list
             StartingPlayers = new List<Player>(Players);
             Dealer = new Player("Dealer");
             deck = new Deck();
@@ -34,9 +40,9 @@ namespace Blackjack_NCrowley
         /// </summary>
         public void PlayRound()
         {
-            Console.WriteLine($"\nStarting round {6 - roundsRemaining} of 5.\n");
+            Console.WriteLine($"\nStarting round {6 - roundsRemaining--} of 5.\n");
 
-            // Discard any cards from previous round and restock the deck with them. Not in standard BJ rules, but card counting might be fun with fake money.
+            // Discard any cards from previous round and restock the deck with them. Not standard BJ rules, but card counting might be fun with fake money.
             var discards = (from player in Players
                             from card in player.Hand.Discard()
                             select card).
@@ -45,21 +51,30 @@ namespace Blackjack_NCrowley
             deck.Restock(discards);
 
             // Each player and the dealer draws a card before bets. Not standard BJ for the players to do so, I think, but might make bets more fun.
-            Players.ForEach(p => p.Draw(deck));
-            Players.ForEach(p => Console.WriteLine($"{p.Name}'s first card is {p.Hand.Cards[0]}."));
 
+            foreach (var player in Players)
+            {
+                player.Draw(deck);
+                Console.WriteLine($"{player.Name}'s first card is {player.Hand.Cards[0]}.");
+            }
             Dealer.Draw(deck);
             Console.WriteLine($"Dealer's first card is {Dealer.Hand.Cards[0]}.\n");
 
             // Having seen one card, and dealer's one, players make bets.
-            Players.ForEach(p => TakeBet(p));
+            foreach (var player in Players)
+            {
+                TakeBet(player);
+            }
 
             // Dealer draws second card. If he has 21, he wins the round.
             Dealer.Draw(deck);
             if (Dealer.Hand.Value == 21)
             {
                 Console.WriteLine($"Dealer's second card is {Dealer.Hand.Cards[1]}. He gets a blackjack!\n");
-                Players.ForEach(p => PlayerLoses(p));
+                foreach (var player in Players)
+                {
+                    PlayerLoses(player);
+                }
                 if (GameShouldEnd())
                 {
                     ShowFinalScores();
@@ -77,7 +92,10 @@ namespace Blackjack_NCrowley
             }
 
             // Each player takes a turn.
-            Players.ForEach(p => TakeTurn(p));
+            foreach (var player in Players)
+            {
+                TakeTurn(player);
+            }
 
             // If the remaining players are not all bust, the dealer takes a turn.
             if (Players.Where(p => !p.IsBust).Any())
@@ -97,9 +115,9 @@ namespace Blackjack_NCrowley
         }
 
         /// <summary>
-        /// Determines if game should end
+        /// Determines if game should end (all players are broke or 5 rounds are up)
         /// </summary>
-        /// <returns>True is game should end, otherwise false</returns>
+        /// <returns>True if game should end, otherwise false</returns>
         private bool GameShouldEnd()
         {
             // Remove any broke players from the game
@@ -116,9 +134,9 @@ namespace Blackjack_NCrowley
             Console.WriteLine($"\nGame Over!\n\n" +
                     $"Final Scores:\n");
             // Print out final cash from greatest to least
-            foreach (Player player in StartingPlayers.OrderBy(p => p.Cash))
+            foreach (var player in StartingPlayers.OrderBy(p => p.Cash))
             {
-                Console.WriteLine($"{player.Name} : {player.Cash}");
+                Console.WriteLine($"\n{player.Name} : {player.Cash}");
             }
         }
 
@@ -172,7 +190,7 @@ namespace Blackjack_NCrowley
                 Card card = player.Draw(deck);
                 Console.WriteLine($"\n{player.Name} draws {card}.\n");
 
-                // If he's bust
+                // If he's bust he loses his bet
                 if (player.IsBust)
                 {
                     Console.WriteLine($"{player.Name} is bust!\n");
@@ -193,6 +211,7 @@ namespace Blackjack_NCrowley
         {
             Console.WriteLine("Dealer's turn.\n");
             Console.WriteLine($"Dealer has {Dealer.Hand} and is at {Dealer.Hand.Value}.");
+
             // Draw while under 17
             while (Dealer.Hand.Value < 17)
             {
@@ -204,19 +223,24 @@ namespace Blackjack_NCrowley
             {
                 Console.WriteLine("Dealer is bust!\n");
 
-                DealerLoses();
+                foreach (var player in Players.Where(p => !p.IsBust))
+                {
+                    player.WinBet();
+                    Console.WriteLine($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
+                }
             }
             // If the dealer isn't bust...
             else
             {
                 Console.WriteLine($"Dealer sticks at {Dealer.Hand.Value}.\n");
 
-                //..., compare his score to that of those players who aren't bust.
+                //..., compare his score to that of those players who aren't bust. Dealer wins if tied.
                 foreach (var player in Players.Where(p => !p.IsBust))
                 {
                     if (player.Hand.Value > Dealer.Hand.Value)
                     {
-                        DealerLoses();
+                        player.WinBet();
+                        Console.WriteLine($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
                     }
                     else
                     {
@@ -227,19 +251,7 @@ namespace Blackjack_NCrowley
         }
 
         /// <summary>
-        /// When dealer loses, non-bust players win their bets
-        /// </summary>
-        private void DealerLoses()
-        {
-            foreach (var player in Players.Where(p => !p.IsBust))
-            {
-                player.WinBet();
-                Console.WriteLine($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
-            }
-        }
-
-        /// <summary>
-        /// Just comminicates the face - nothing else needed as players already paid their bets
+        /// Just comminicates the fact - nothing else needed as players already paid their bets
         /// </summary>
         /// <param name="player">Losing player</param>
         private void PlayerLoses(Player player)
@@ -258,6 +270,7 @@ namespace Blackjack_NCrowley
         /// <returns>True if another card is wanted, otherwise false</returns>
         private bool OfferCard(Player player)
         {
+            // To check for valid input (s/t)
             while (true)
             {
                 Console.WriteLine($"{player.Name}, you're holding {player.Hand} and are at {player.Hand.Value}.\n" +
@@ -271,6 +284,7 @@ namespace Blackjack_NCrowley
                 {
                     return false;
                 }
+                // Keep repeating till he gets it right
                 Console.WriteLine("Please answer s for stick or t for twist.\n");
                 continue;
             }

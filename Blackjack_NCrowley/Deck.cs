@@ -8,7 +8,7 @@ namespace Blackjack_NCrowley
     {
         public static string[] Suits = { "Clubs", "Hearts", "Spades", "Diamonds" };
 
-        // The names of the ranks (for printing) mapped to their values.
+        // The names of the ranks (for printing) mapped to their values for determining hand values.
         public static Dictionary<string, int> Ranks = new Dictionary<string, int>()
         {
             {"Two", 2 },{"Three", 3}, {"Four", 4}, {"Five", 5}, {"Six", 6}, {"Seven", 7}, {"Eight", 8}, {"Nine", 9}, {"Ten", 10 }, {"Jack", 10}, {"Queen", 10 }, {"King", 10}, {"Ace", 11}
@@ -17,12 +17,9 @@ namespace Blackjack_NCrowley
         // The cards in the deck as a queue for easy drawing from the top and restocking to the bottom
         private readonly Queue<Card> Contents;
 
-        /// <summary>
-        /// Constructor. None other needed.
-        /// </summary>
         public Deck()
         {
-            // Make the cards
+            // Make a card of each suit/rank combination
             var cards = from suit in Suits from rank in Ranks.Keys select new Card(suit, rank);
             // Shuffle the cards and turn them into the deck
             Contents = new Queue<Card>(Shuffle(cards));
@@ -34,13 +31,12 @@ namespace Blackjack_NCrowley
         /// <param name="cards">The discards from the last round</param>
         public void Restock(IEnumerable<Card> cards)
         {
-            Shuffle(cards).ForEach(card => Contents.Enqueue(card));
+            foreach (var card in Shuffle(cards))
+            {
+                Contents.Enqueue(card);
+            }
         }
 
-        /// <summary>
-        /// Takes the top card of the deck
-        /// </summary>
-        /// <returns>The top card of the deck</returns>
         public Card TakeTopCard()
         {
             return Contents.Dequeue();

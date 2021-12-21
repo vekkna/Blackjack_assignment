@@ -14,18 +14,19 @@ namespace Blackjack_NCrowley
         // The contents of the hand
         public List<Card> Cards { get; }
 
+        // The value of the hand
         public int Value
         {
             get
             {
-                // Add the values of the cards in hand, using the Rank enum's values (faces are ten, ace is eleven)
+                // Add the values of the cards in hand (faces are ten, ace is eleven)
                 int value = (from card in Cards select Deck.Ranks[card.Rank]).Sum();
                 // Count how many aces are in the hand
                 int numAces = (from card in Cards where card.Rank is "Ace" select card).Count();
-                // If hand is bust and it contains "big" aces
+                // While hand is bust and contains an ace valued at 11
                 while (numAces > 0 && value > 21)
                 {
-                    // change aces to "small" aces
+                    // change one ace's value to 1
                     numAces -= 1;
                     value -= 10;
                 }
@@ -49,7 +50,7 @@ namespace Blackjack_NCrowley
         }
 
         /// <summary>
-        /// Discards the hand, clearing the card array and returning the cards discarded
+        /// Discards the hand, clearing the card array and returning the cards discarded so they can be sent to the bottom of the deck.
         /// </summary>
         /// <returns>The discarded Cards</returns>
         public List<Card> Discard()
@@ -61,9 +62,7 @@ namespace Blackjack_NCrowley
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            Cards.ForEach(c => sb.Append(" " + c.ToString())); // format this better
-            return sb.ToString();
+            return string.Join(" ", Cards);
         }
     }
 }
