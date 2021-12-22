@@ -11,6 +11,8 @@ namespace Blackjack_NCrowley
     {
         // Fields
 
+        private readonly UI UI;
+
         // The currently (not broke) players
         private readonly List<Player> Players;
 
@@ -25,9 +27,10 @@ namespace Blackjack_NCrowley
         /// Ctor, none others needed
         /// </summary>
         /// <param name="players">List of players</param>
-        public Game(List<Player> players)
+        public Game(List<Player> players, UI ui)
         {
             Players = players;
+            UI = ui;
             // Copy the Players list
             StartingPlayers = new List<Player>(Players);
             Dealer = new Player("Dealer");
@@ -39,7 +42,7 @@ namespace Blackjack_NCrowley
         /// </summary>
         public void PlayRound()
         {
-            Console.WriteLine($"\nStarting round {6 - roundsRemaining--} of 5.\n");
+            UI.DisplayOutput($"\nStarting round {6 - roundsRemaining--} of 5.\n");
 
             // Discard any cards from previous round and restock the deck with them. Not standard BJ rules, but card counting might be fun with fake money.
             var discards = (from player in Players
@@ -67,10 +70,10 @@ namespace Blackjack_NCrowley
             Draw(Dealer, false);
             if (Dealer.Hand.Value == 21)
             {
-                Console.WriteLine("\nHe gets a blackjack!\n");
+                UI.DisplayOutput("\nHe gets a blackjack!\n");
                 foreach (var player in Players)
                 {
-                    PlayerLoses(player);
+                    PrintThatPlayerLoses(player);
                 }
                 if (GameShouldEnd())
                 {
@@ -112,11 +115,11 @@ namespace Blackjack_NCrowley
             player.Hand.AddCard(card);
             if (reveal)
             {
-                Console.WriteLine($"{player.Name} draws the {card}.\n");
+                UI.DisplayOutput($"{player.Name} draws the {card}.\n");
             }
             else
             {
-                Console.WriteLine($"{player.Name} draws a hidden card.\n");
+                UI.DisplayOutput($"{player.Name} draws a hidden card.\n");
             }
         }
 
@@ -137,12 +140,11 @@ namespace Blackjack_NCrowley
         /// </summary>
         private void ShowFinalScores()
         {
-            Console.WriteLine($"\nGame Over!\n\n" +
-                    $"Final Scores:\n");
+            UI.DisplayOutput($"\nGame Over!\n\nFinal Scores:\n");
             // Print out final cash from greatest to least
             foreach (var player in StartingPlayers.OrderBy(p => p.Cash))
             {
-                Console.WriteLine($"\n{player.Name} : {player.Cash}");
+                UI.DisplayOutput($"\n{player.Name} : {player.Cash}");
             }
         }
 
@@ -152,11 +154,12 @@ namespace Blackjack_NCrowley
         /// <param name="player">Player making the bet</param>
         private void TakeBet(Player player)
         {
-            Console.WriteLine($"\n{player.Name}, how much will you bet? (max {player.Cash:C0}).");
-            InputVerifier.GetNumberInRangeThen(1, player.Cash, $"Enter a number between 1 and {player.Cash}.\n", bet =>
+            UI.DisplayOutput($"\n{player.Name}, how much will you bet? (max {player.Cash:C0}).");
+            var inputVerifier = new InputVerifier(UI);
+            inputVerifier.GetNumberInRangeThen(1, player.Cash, $"Enter a number between 1 and {player.Cash}.\n", bet =>
             {
                 player.MakeBet(bet);
-                Console.WriteLine($"\n{player.Name} makes a bet of {bet:C0} and has {player.Cash:C0} left.");
+                UI.DisplayOutput($"\n{player.Name} makes a bet of {bet:C0} and has {player.Cash:C0} left.");
             });
         }
 
@@ -166,7 +169,7 @@ namespace Blackjack_NCrowley
         /// <param name="player"></param>
         private void TakeTurn(Player player)
         {
-            Console.WriteLine($"{player.Name}'s turn:\n");
+            UI.DisplayOutput($"{player.Name}'s turn:\n");
 
             // Returns true on "t(wist)", false on "s(tick)"
             while (OfferCard(player))
@@ -176,15 +179,15 @@ namespace Blackjack_NCrowley
                 // If he's bust he loses his bet
                 if (player.IsBust)
                 {
-                    Console.WriteLine($"{player.Name} is bust!\n");
-                    PlayerLoses(player);
+                    UI.DisplayOutput($"{player.Name} is bust!\n");
+                    PrintThatPlayerLoses(player);
 
                     // and doesn't get another offer
                     return;
                 }
             }
             // here player has stuck
-            Console.WriteLine($"\n{player.Name} sticks at {player.Hand.Value}.\n");
+            UI.DisplayOutput($"\n{player.Name} sticks at {player.Hand.Value}.\n");
         }
 
         /// <summary>
@@ -192,8 +195,8 @@ namespace Blackjack_NCrowley
         /// </summary>
         private void TakeDealerTurn()
         {
-            Console.WriteLine("Dealer's turn.\n");
-            Console.WriteLine($"Dealer has {Dealer.Hand} and is at {Dealer.Hand.Value}.");
+            UI.DisplayOutput("Dealer's turn.\n");
+            UI.DisplayOutput($"Dealer has {Dealer.Hand} and is at {Dealer.Hand.Value}.");
 
             // Draw while under 17
             while (Dealer.Hand.Value < 17)
@@ -203,18 +206,18 @@ namespace Blackjack_NCrowley
 
             if (Dealer.IsBust)
             {
-                Console.WriteLine("Dealer is bust!\n");
+                UI.DisplayOutput("Dealer is bust!\n");
 
                 foreach (var player in Players.Where(p => !p.IsBust))
                 {
                     player.WinBet();
-                    Console.WriteLine($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
+                    UI.DisplayOutput($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
                 }
             }
             // If the dealer isn't bust...
             else
             {
-                Console.WriteLine($"Dealer sticks at {Dealer.Hand.Value}.\n");
+                UI.DisplayOutput($"Dealer sticks at {Dealer.Hand.Value}.\n");
 
                 //..., compare his score to that of those players who aren't bust. Dealer wins if tied.
                 foreach (var player in Players.Where(p => !p.IsBust))
@@ -222,11 +225,11 @@ namespace Blackjack_NCrowley
                     if (player.Hand.Value > Dealer.Hand.Value)
                     {
                         player.WinBet();
-                        Console.WriteLine($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
+                        UI.DisplayOutput($"{player.Name} wins {player.Bet:C0} and now has {player.Cash:C0}.\n");
                     }
                     else
                     {
-                        PlayerLoses(player);
+                        PrintThatPlayerLoses(player);
                     }
                 }
             }
@@ -236,12 +239,12 @@ namespace Blackjack_NCrowley
         /// Just comminicates the fact - nothing else needed as players already paid their bets
         /// </summary>
         /// <param name="player">Losing player</param>
-        private void PlayerLoses(Player player)
+        private void PrintThatPlayerLoses(Player player)
         {
-            Console.WriteLine($"{player.Name} loses {player.Bet:C0} and now has {player.Cash:C0}.\n");
+            UI.DisplayOutput($"{player.Name} loses {player.Bet:C0} and now has {player.Cash:C0}.\n");
             if (player.Cash == 0)
             {
-                Console.WriteLine($"{player.Name} is broke and out of the game!\n");
+                UI.DisplayOutput($"{player.Name} is broke and out of the game!\n");
             }
         }
 
@@ -255,9 +258,8 @@ namespace Blackjack_NCrowley
             // To check for valid input (s/t)
             while (true)
             {
-                Console.WriteLine($"{player.Name}, you're holding {player.Hand}, so you are at {player.Hand.Value}.\n" +
-"Stick (s) or twist (t)?");
-                string ans = Console.ReadLine();
+                UI.DisplayOutput($"{player.Name}, you're holding {player.Hand}, so you are at {player.Hand.Value}.\nStick (s) or twist (t)?");
+                string ans = UI.GetInput();
                 if (ans == "t")
                 {
                     return true;
@@ -267,7 +269,7 @@ namespace Blackjack_NCrowley
                     return false;
                 }
                 // Keep repeating till he gets it right
-                Console.WriteLine("Please answer s for stick or t for twist.\n");
+                UI.DisplayOutput("Please answer s for stick or t for twist.\n");
                 continue;
             }
         }

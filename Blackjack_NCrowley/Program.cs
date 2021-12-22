@@ -17,7 +17,7 @@ namespace Blackjack_NCrowley
         private static void Main()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Game game = new Game(GetPlayers());
+            Game game = new Game(GetPlayers(), new ConsoleUI());
             game.PlayRound();
         }
 
@@ -30,7 +30,8 @@ namespace Blackjack_NCrowley
             Console.WriteLine("Welcome to Blackjack.\n\n");
             Console.WriteLine("How many human players are there?");
             var players = new List<Player>();
-            InputVerifier.GetNumberInRangeThen(1, 4, "Enter a number between 1 and 4", numPlayers =>
+            var inputVerifier = new InputVerifier(new ConsoleUI());
+            inputVerifier.GetNumberInRangeThen(1, 4, "Enter a number between 1 and 4", numPlayers =>
             {
                 players = (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
             });
