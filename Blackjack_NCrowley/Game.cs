@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -148,29 +147,17 @@ namespace Blackjack_NCrowley
         }
 
         /// <summary>
-        /// Asks a player to make a bet, checks for good input and stores the bet details
+        /// Asks a player to make a bet, checks for good input and stores the bet details on the player
         /// </summary>
         /// <param name="player">Player making the bet</param>
         private void TakeBet(Player player)
         {
             Console.WriteLine($"\n{player.Name}, how much will you bet? (max {player.Cash:C0}).");
-
-            // Keep asking till good input entered
-            while (true)
+            InputVerifier.GetNumberInRangeThen(1, player.Cash, $"Enter a number between 1 and {player.Cash}.\n", bet =>
             {
-                Console.WriteLine($"Enter a number between 1 and {player.Cash}.\n");
-                // make sure it's a number
-                if (int.TryParse(Console.ReadLine(), out int bet))
-                {
-                    // if it's in range, make the bet
-                    if (bet > 0 && bet <= player.Cash)
-                    {
-                        player.MakeBet(bet);
-                        Console.WriteLine($"\n{player.Name} makes a bet of {bet:C0} and has {player.Cash:C0} left.");
-                        return;
-                    }
-                }
-            }
+                player.MakeBet(bet);
+                Console.WriteLine($"\n{player.Name} makes a bet of {bet:C0} and has {player.Cash:C0} left.");
+            });
         }
 
         /// <summary>

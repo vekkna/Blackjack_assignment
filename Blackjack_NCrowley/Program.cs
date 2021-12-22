@@ -29,21 +29,27 @@ namespace Blackjack_NCrowley
         {
             Console.WriteLine("Welcome to Blackjack.\n\n");
             Console.WriteLine("How many human players are there?");
-
-            // Keep asking till he gets it right
-            while (true)
+            var players = new List<Player>();
+            InputVerifier.GetNumberInRangeThen(1, 4, "Enter a number between 1 and 4", numPlayers =>
             {
-                Console.WriteLine("Enter a number between 1 and 4");
-                // Make sure it's a number
-                if (int.TryParse(Console.ReadLine(), out int numPlayers))
-                {
-                    // If it's in range, return a list of that many players for the game's ctor
-                    if (numPlayers > 0 && numPlayers < 5)
-                    {
-                        return (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
-                    }
-                }
-            }
+                players = (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
+            });
+            return players;
         }
+
+        /*            // Keep asking till he gets it right
+                    while (true)
+                    {
+                        Console.WriteLine("Enter a number between 1 and 4");
+                        // Make sure it's a number
+                        if (int.TryParse(Console.ReadLine(), out int numPlayers))
+                        {
+                            // If it's in range, return a list of that many players for the game's ctor
+                            if (numPlayers > 0 && numPlayers < 5)
+                            {
+                                return (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
+                            }
+                        }
+                    }*/
     }
 }
