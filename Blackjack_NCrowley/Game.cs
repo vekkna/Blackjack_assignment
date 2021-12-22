@@ -56,7 +56,7 @@ namespace Blackjack_NCrowley
             {
                 Draw(player);
             }
-            Draw(Dealer, false);
+            Draw(Dealer);
 
             // Having seen one card, and dealer's one, players make bets.
             foreach (var player in Players)
@@ -65,7 +65,7 @@ namespace Blackjack_NCrowley
             }
 
             // Dealer draws second card. If he has 21, he wins the round.
-            Draw(Dealer);
+            Draw(Dealer, false);
             if (Dealer.Hand.Value == 21)
             {
                 Console.WriteLine("\nHe gets a blackjack!\n");
@@ -82,11 +82,6 @@ namespace Blackjack_NCrowley
                 {
                     PlayRound();
                 }
-            }
-            else
-            {
-                // If he doesn't have blackjack the round continues
-                Console.WriteLine("It remains hidden for now.\n");
             }
 
             // Each player takes a turn.
@@ -112,13 +107,17 @@ namespace Blackjack_NCrowley
             }
         }
 
-        private void Draw(Player playe, bool reveal = true)
+        private void Draw(Player player, bool reveal = true)
         {
             Card card = deck.TakeTopCard();
             player.Hand.AddCard(card);
             if (reveal)
             {
-                Console.WriteLine($"{player.Name} draws the {card}.");
+                Console.WriteLine($"{player.Name} draws the {card}.\n");
+            }
+            else
+            {
+                Console.WriteLine($"{player.Name} draws a hidden card.\n");
             }
         }
 
@@ -154,33 +153,24 @@ namespace Blackjack_NCrowley
         /// <param name="player">Player making the bet</param>
         private void TakeBet(Player player)
         {
-            Console.WriteLine($"\n{player.Name}, how much will you bet? (max: {player.Cash:C0}).");
-            int bet;
-            // Check for valid input
+            Console.WriteLine($"\n{player.Name}, how much will you bet? (max {player.Cash:C0}).");
+
+            // Keep asking till good input entered
             while (true)
             {
-                // if a number isn't entered,error is thrown
-                try
+                Console.WriteLine($"Enter a number between 1 and {player.Cash}.\n");
+                // make sure it's a number
+                if (int.TryParse(Console.ReadLine(), out int bet))
                 {
-                    bet = Convert.ToInt32(Console.ReadLine());
-                    // if number is out of range, error is thrown
-                    if (bet < 1 || bet > player.Cash)
+                    // if it's in range, make the bet
+                    if (bet > 0 && bet <= player.Cash)
                     {
-                        throw new Exception();
+                        player.MakeBet(bet);
+                        Console.WriteLine($"\n{player.Name} makes a bet of {bet:C0} and has {player.Cash:C0} left.");
+                        return;
                     }
-                    // if input is a number in the right range, break out of of the validation loop
-                    break;
-                }
-                catch
-                {
-                    // if either error is commited, remind player of valid input and try again
-                    Console.WriteLine($"Enter a number between 1 and {player.Cash:C0}.\n");
-                    continue;
                 }
             }
-            // Once input is good, make the bet
-            player.MakeBet(bet);
-            Console.WriteLine($"\n{player.Name} makes a bet of {bet:C0} and has {player.Cash:C0} left.");
         }
 
         /// <summary>

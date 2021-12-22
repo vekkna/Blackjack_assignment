@@ -28,32 +28,22 @@ namespace Blackjack_NCrowley
         private static List<Player> GetPlayers()
         {
             Console.WriteLine("Welcome to Blackjack.\n\n");
-            Console.WriteLine("How many human players are there? (1 - 4)");
+            Console.WriteLine("How many human players are there?");
 
-            int numPlayers;
-
+            // Keep asking till he gets it right
             while (true)
             {
-                // if player doesn't enter a number, throw an error
-                try
+                Console.WriteLine("Enter a number between 1 and 4");
+                // Make sure it's a number
+                if (int.TryParse(Console.ReadLine(), out int numPlayers))
                 {
-                    numPlayers = Convert.ToInt32(Console.ReadLine());
-                    //  if it's a number but not in the range, throw an error
-                    if (numPlayers < 1 || numPlayers > 4)
+                    // If it's in range, return a list of that many players for the game's ctor
+                    if (numPlayers > 0 && numPlayers < 5)
                     {
-                        throw new Exception();
+                        return (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
                     }
-                    // if it's a number in the right range break out of the validation loop
-                    break;
-                }
-                catch
-                {
-                    // respond to either error this way
-                    Console.WriteLine("Please enter only numbers between 1 and 4.\n");
                 }
             }
-            // Once the input is correct, return a list of that many players to pass to Game.cs's ctor
-            return (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
         }
     }
 }
