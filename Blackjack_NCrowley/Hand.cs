@@ -54,14 +54,28 @@ namespace Blackjack_NCrowley
         /// <returns>The discarded Cards</returns>
         public List<Card> Discard()
         {
-            List<Card> discards = new List<Card>(Cards);
+            // copy the cards so we can return them after clearing them.
+            var discards = new List<Card>(Cards);
             Cards.Clear();
             return discards;
         }
 
+        /// <summary>
+        /// Creates a string of the hand's cards, separated by commas or "and" before the last one.
+        /// </summary>
+        /// <returns>String representation of cards in hand</returns>
         public override string ToString()
         {
-            return string.Join(" and ", Cards);
+            if (Cards.Count <= 2)
+            {
+                return string.Join(" and ", Cards);
+            }
+            // Get strings of all cards from Cards expect the last one (slicing like this needs C#8)
+            var allExceptLast = Cards.Select(card => card.ToString()).ToArray()[..^1];
+            // Get string of last one
+            var last = Cards[^1].ToString();
+            // join the first group with commas, then add the last one with an "and".
+            return $"{string.Join(", ", allExceptLast)} and {last}";
         }
     }
 }

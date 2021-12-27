@@ -17,7 +17,7 @@
 
         public override string ToString()
         {
-            return $"{Rank} of {Suit}";
+            return $"the {Rank} of {Suit}";
         }
     }
 }

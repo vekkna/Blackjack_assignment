@@ -3,10 +3,11 @@
 namespace Blackjack_NCrowley
 {
     /// <summary>
-    /// Class of static methods used to make sure player input is valid
+    /// Class of methods used to make sure player input is valid
     /// </summary>
     internal class InputVerifier
     {
+        // Controller for chosen view
         private UI ui;
 
         public InputVerifier(UI ui)
@@ -43,20 +44,6 @@ namespace Blackjack_NCrowley
         private bool IsInRange(int number, int min, int max)
         {
             return number >= min && number <= max;
-        }
-
-        public int GetNumber(string message)
-        {
-            // keep asking till input is good
-            while (true)
-            {
-                ui.DisplayOutput(message);
-                // Get input and make sure it's a number
-                if (int.TryParse(ui.GetInput(), out int number))
-                {
-                    return (number);
-                }
-            }
         }
     }
 }

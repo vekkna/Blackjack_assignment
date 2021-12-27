@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Blackjack_NCrowley
+﻿namespace Blackjack_NCrowley
 {
+    /// <summary>
+    /// Abstract class for communicating with chosen UI.
+    /// Derive classes from from it for various UI options
+    /// </summary>
     internal abstract class UI
     {
         public abstract string GetInput();

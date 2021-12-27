@@ -4,27 +4,21 @@ using System.Linq;
 
 namespace Blackjack_NCrowley
 {
-    /*
-     * TODOs
-     * Extra score for bj
-     * Save high score
-     * Separate Dealer.cs?
-     * format cards better
-     * */
-
     internal class Program
     {
         private static void Main()
         {
+            // To display euro signs
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+            // Create a game, with chosen players and chosen UI view
             Game game = new Game(GetPlayers(), new ConsoleUI());
             game.PlayRound();
         }
 
         /// <summary>
-        /// Asks how many players there will be and checks validity
+        /// Asks how many players there will be and checks validity, then returns a list of that many players
         /// </summary>
-        /// <returns>Number of players</returns>
+        /// <returns>List of players</returns>
         private static List<Player> GetPlayers()
         {
             Console.WriteLine("Welcome to Blackjack.\n\n");
@@ -33,24 +27,9 @@ namespace Blackjack_NCrowley
             var inputVerifier = new InputVerifier(new ConsoleUI());
             inputVerifier.GetNumberInRangeThen(1, 4, "Enter a number between 1 and 4", numPlayers =>
             {
-                players = (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
+                players = Enumerable.Range(1, numPlayers).Select(i => new Player(i)).ToList();
             });
             return players;
         }
-
-        /*            // Keep asking till he gets it right
-                    while (true)
-                    {
-                        Console.WriteLine("Enter a number between 1 and 4");
-                        // Make sure it's a number
-                        if (int.TryParse(Console.ReadLine(), out int numPlayers))
-                        {
-                            // If it's in range, return a list of that many players for the game's ctor
-                            if (numPlayers > 0 && numPlayers < 5)
-                            {
-                                return (from i in Enumerable.Range(1, numPlayers) select new Player(i)).ToList();
-                            }
-                        }
-                    }*/
     }
 }

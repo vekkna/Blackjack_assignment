@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Blackjack_NCrowley
 {
+    /// <summary>
+    /// Deck of cards
+    /// </summary>
     internal class Deck
     {
         public static string[] Suits = { "Clubs", "Hearts", "Spades", "Diamonds" };

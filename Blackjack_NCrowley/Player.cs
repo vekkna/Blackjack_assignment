@@ -8,11 +8,13 @@ namespace Blackjack_NCrowley
     internal class Player
     {
         // Properties
-
+        ///
         public string Name { get; }
+
         public int Cash { get; private set; }
         public int Bet { get; private set; }
         public Hand Hand { get; private set; }
+        public int HandValue => Hand.Value;
         public bool IsBust => Hand.Value > 21;
 
         /// <summary>
@@ -47,21 +49,33 @@ namespace Blackjack_NCrowley
             Hand = new Hand();
         }
 
+        public List<Card> DiscardHand()
+        {
+            return Hand.Discard();
+        }
+
+        public void AddCardToHand(Card card)
+        {
+            Hand.AddCard(card);
+        }
+
         /// <summary>
-        /// Makes a bet, decreasing cash by that amount so that losses don't need any methods.
+        /// Makes a bet, decreasing cash by that amount
         /// </summary>
         /// <param name="bet">Amount to bet</param>
         public void MakeBet(int bet)
         {
             Bet = bet;
+            // Pay for bet now so that losses don't need to be handled later
             Cash -= bet;
         }
 
         /// <summary>
-        /// Player wins amount bet time 2 to make up for the outlay
+        /// Player wins bet
         /// </summary>
         public void WinBet()
         {
+            //times 2 to make up for the outlay
             Cash += Bet * 2;
         }
     }
