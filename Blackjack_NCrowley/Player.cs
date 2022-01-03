@@ -13,12 +13,12 @@ namespace Blackjack_NCrowley
 
         public int Cash { get; private set; }
         public int Bet { get; private set; }
-        public Hand Hand { get; private set; }
+        public Hand Hand { get; }
         public int HandValue => Hand.Value;
         public bool IsBust => Hand.Value > 21;
 
         /// <summary>
-        /// Contructor that takes an int and turns it into a Name string
+        /// Constructor that takes an int and turns it into a Name string
         /// </summary>
         /// <param name="num">Int, converted to string number word</param>
         /// <param name="cash">Default value for starting cash is 100</param>

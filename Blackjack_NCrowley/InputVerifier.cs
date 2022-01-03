@@ -8,11 +8,11 @@ namespace Blackjack_NCrowley
     internal class InputVerifier
     {
         // Controller for chosen view
-        private UI ui;
+        private readonly UI _ui;
 
         public InputVerifier(UI ui)
         {
-            this.ui = ui;
+            this._ui = ui;
         }
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace Blackjack_NCrowley
             // keep asking till input is good
             while (true)
             {
-                ui.DisplayOutput(message);
+                _ui.DisplayOutput(message);
                 // Get input and make sure it's a number
-                if (int.TryParse(ui.GetInput(), out int number))
+                if (int.TryParse(_ui.GetInput(), out int number))
                 {
                     // If it's in range, call the result
                     if (IsInRange(number, min, max))

@@ -70,7 +70,7 @@ namespace Blackjack_NCrowley
             {
                 return string.Join(" and ", Cards);
             }
-            // Get strings of all cards from Cards expect the last one (slicing like this needs C#8)
+            // Get strings of all cards from Cards except the last one (slicing like this needs C#8)
             var allExceptLast = Cards.Select(card => card.ToString()).ToArray()[..^1];
             // Get string of last one
             var last = Cards[^1].ToString();

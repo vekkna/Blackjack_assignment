@@ -12,20 +12,32 @@ namespace Blackjack_NCrowley
         public static string[] Suits = { "Clubs", "Hearts", "Spades", "Diamonds" };
 
         // The names of the ranks (for printing) mapped to their values for determining hand values.
-        public static Dictionary<string, int> Ranks = new Dictionary<string, int>()
+        public static Dictionary<string, int> Ranks = new()
         {
-            {"Two", 2 },{"Three", 3}, {"Four", 4}, {"Five", 5}, {"Six", 6}, {"Seven", 7}, {"Eight", 8}, {"Nine", 9}, {"Ten", 10 }, {"Jack", 10}, {"Queen", 10 }, {"King", 10}, {"Ace", 11}
+            { "Two", 2 },
+            { "Three", 3 },
+            { "Four", 4 },
+            { "Five", 5 },
+            { "Six", 6 },
+            { "Seven", 7 },
+            { "Eight", 8 },
+            { "Nine", 9 },
+            { "Ten", 10 },
+            { "Jack", 10 },
+            { "Queen", 10 },
+            { "King", 10 },
+            { "Ace", 11 }
         };
 
         // The cards in the deck as a queue for easy drawing from the top and restocking to the bottom
-        private readonly Queue<Card> Contents;
+        private readonly Queue<Card> _contents;
 
         public Deck()
         {
             // Make a card of each suit/rank combination
             var cards = from suit in Suits from rank in Ranks.Keys select new Card(suit, rank);
             // Shuffle the cards and turn them into the deck
-            Contents = new Queue<Card>(Shuffle(cards));
+            _contents = new Queue<Card>(Shuffle(cards));
         }
 
         /// <summary>
@@ -36,13 +48,13 @@ namespace Blackjack_NCrowley
         {
             foreach (var card in Shuffle(cards))
             {
-                Contents.Enqueue(card);
+                _contents.Enqueue(card);
             }
         }
 
         public Card TakeTopCard()
         {
-            return Contents.Dequeue();
+            return _contents.Dequeue();
         }
 
         /// <summary>
@@ -52,7 +64,7 @@ namespace Blackjack_NCrowley
         /// <returns>Shuffled cards</returns>
         private List<Card> Shuffle(IEnumerable<Card> cards)
         {
-            return cards.OrderBy(x => new Random().NextDouble()).ToList();
+            return cards.OrderBy(_ => new Random().NextDouble()).ToList();
         }
     }
 }
